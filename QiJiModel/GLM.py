@@ -1,3 +1,5 @@
+import os
+
 from langchain.llms.base import LLM
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from typing import List, Optional
@@ -17,7 +19,7 @@ class GLM(LLM):
 
     # author:xuhe
     # 我要在这里设置一个常量,这个常量标志是否使用流式输出
-    # 注意,使用流式输出的时候,你不能自己print输出,它会自动输出的
+    # 注意,使用流式输出的时候,你不能自己print输出,它会自动输出的,但是你可以从run方法中获取返回值
     STREAMING_OUTPUT: bool = False
 
     def __init__(self):
@@ -36,31 +38,58 @@ class GLM(LLM):
     # BUG:我怀疑这个方法现在叫做__call__,但是我不确定(closed)
     # 最新版本是_call
     def _call(self, prompt: str, history: List[str] = [], stop: Optional[List[str]] = None):
-        response = ""  # 这个变量是用来存储返回的结果的
-        if not self.STREAMING_OUTPUT:
-            response, _ = self.model.chat(
+        # 让这段最初始的代码留着吧,我不想为此存一个GIT了
+        # response = ""  # 这个变量是用来存储返回的结果的
+        # if not self.STREAMING_OUTPUT:
+        #     response, _ = self.model.chat(
+        #         self.tokenizer, prompt,
+        #         history=history[-self.history_len:] if self.history_len > 0 else [],
+        #         max_length=self.max_token, temperature=self.temperature,
+        #         top_p=self.top_p)
+        # else:
+        #     # 使用流式输出
+        #     # wait for test
+        #     # 这两个代码可以合并减少代码量
+        #     for response, _ in self.model.stream_chat(
+        #             self.tokenizer, prompt,
+        #             history=history[-self.history_len:] if self.history_len > 0 else [],
+        #             max_length=self.max_token, temperature=self.temperature,
+        #             top_p=self.top_p):
+        #         os.system('clear')  # 清屏
+        #         print(response, flush=True)  # 输出
+
+        # 以下是修改之后的更易懂的代码
+        for response, _ in self.model.stream_chat(
                 self.tokenizer, prompt,
                 history=history[-self.history_len:] if self.history_len > 0 else [],
                 max_length=self.max_token, temperature=self.temperature,
-                top_p=self.top_p)
-        else:
-            # 使用流式输出
-            pass
+                top_p=self.top_p):
+            if self.STREAMING_OUTPUT:  # 如果使用流式输出
+                os.system('clear')  # 清屏
+                print(response, flush=True)  # 输出
+
         return response
-
-    # # DEBUG:同上
-    # def __call__(self, prompt: str, history: List[str] = [], stop: Optional[List[str]] = None) -> str:
-    #     response, _ = self.model.chat(
-    #         self.tokenizer, prompt,
-    #         history=history[-self.history_len:] if self.history_len > 0 else [],
-    #         max_length=self.max_token, temperature=self.temperature,
-    #         top_p=self.top_p)
-    #     return response
-
-    # 大佬快来写一下流式输出！！！
 
 
 if __name__ == '__main__':
     MODEL_PATH = "/home/qiji/chatglm2-6b/"
     llm = GLM()
     llm.load_model(model_name_or_path=MODEL_PATH)
+
+    llm.STREAMING_OUTPUT = True  # 注意!
+
+    from langchain.prompts import PromptTemplate
+    from langchain.chains import LLMChain
+
+    # test:测试是否可以正常运行回答
+    prompt = PromptTemplate(
+        input_variables=["question"],
+        template="{question}"
+    )
+    chain = LLMChain(llm=llm, prompt=prompt)
+
+    index = 0
+    while index < 2:
+        index += 1
+        product = input('> ')
+        print(chain.run(product))

@@ -87,4 +87,7 @@
 # agent.run("今天天气如何？")
 
 
-from langchain.llms import OpenAI
+import os
+print('this is a test')
+os.system('clear')
+print('this is a test')

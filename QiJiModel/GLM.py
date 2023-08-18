@@ -7,9 +7,6 @@ from langchain.llms.base import LLM
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 
-# from torch.mps import empty_cache
-
-
 class GLM(LLM):
     max_token: int = 4096
     temperature: float = 0.2
@@ -17,6 +14,11 @@ class GLM(LLM):
     tokenizer: object = None
     model: object = None
     history_len: int = 1024
+
+    # author:xuhe
+    # 我要在这里设置一个常量,这个常量标志是否使用流式输出
+    # 注意,使用流式输出的时候,你不能自己print输出,它会自动输出的
+    STREAMING_OUTPUT: bool = False
 
     def __init__(self):
         super().__init__()
@@ -31,14 +33,19 @@ class GLM(LLM):
         self.model = AutoModel.from_pretrained(model_name_or_path, config=model_config,
                                                trust_remote_code=True).half().cuda()
 
-    # DEBUG:我怀疑这个方法现在叫做__call__,但是我不确定(closed)
+    # BUG:我怀疑这个方法现在叫做__call__,但是我不确定(closed)
     # 最新版本是_call
     def _call(self, prompt: str, history: List[str] = [], stop: Optional[List[str]] = None):
-        response, _ = self.model.chat(
-            self.tokenizer, prompt,
-            history=history[-self.history_len:] if self.history_len > 0 else [],
-            max_length=self.max_token, temperature=self.temperature,
-            top_p=self.top_p)
+        response = ""  # 这个变量是用来存储返回的结果的
+        if not self.STREAMING_OUTPUT:
+            response, _ = self.model.chat(
+                self.tokenizer, prompt,
+                history=history[-self.history_len:] if self.history_len > 0 else [],
+                max_length=self.max_token, temperature=self.temperature,
+                top_p=self.top_p)
+        else:
+            # 使用流式输出
+            pass
         return response
 
     # # DEBUG:同上

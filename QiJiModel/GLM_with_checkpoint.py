@@ -1,26 +1,18 @@
 import os
 
 import torch
-from langchain.llms.base import LLM
+from overrides import overrides
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 from typing import List, Optional
 
+from QiJiModel.GLM import GLM as BASE_GLM
 
-class GLM(LLM):
-    max_token: int = 4096
-    temperature: float = 0.2
-    top_p = 0.9
-    tokenizer: object = None
-    model: object = None
-    history_len: int = 1024
 
+class GLM(BASE_GLM):
     def __init__(self):
         super().__init__()
 
-    @property
-    def _llm_type(self) -> str:
-        return "GLM"
-
+    @overrides
     def load_model(self, llm_device="gpu", model_name_or_path: str = None, checkpoint_path: str = None):
         config = AutoConfig.from_pretrained(model_name_or_path, trust_remote_code=True, pre_seq_len=128)  # 加载配置文件
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)  # 加载分词器
@@ -38,15 +30,6 @@ class GLM(LLM):
         model = model.cuda()
         model = model.eval()
         self.model = model  # 加载模型
-
-    # DEBUG:我怀疑这个方法现在叫做__call__,但是我不确定
-    def _call(self, prompt: str, history: List[str] = [], stop: Optional[List[str]] = None):
-        response, _ = self.model.chat(
-            self.tokenizer, prompt,
-            history=history[-self.history_len:] if self.history_len > 0 else [],
-            max_length=self.max_token, temperature=self.temperature,
-            top_p=self.top_p)
-        return response
 
 
 if __name__ == '__main__':
@@ -66,5 +49,8 @@ if __name__ == '__main__':
     )
     chain = LLMChain(llm=llm, prompt=prompt)
 
-    product = input('> ')
-    print(chain.run(product))
+    index = 0
+    while index < 2:
+        index += 1
+        product = input('> ')
+        print(chain.run(product))

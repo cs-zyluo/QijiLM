@@ -1,0 +1,2 @@
+# 用来放一些无法归类到具体的东西里面的module
+from QiJiOther.SimilaritySearch import SimilaritySearch

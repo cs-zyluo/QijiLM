@@ -87,7 +87,28 @@
 # agent.run("今天天气如何？")
 
 
-import os
-print('this is a test')
-os.system('clear')
-print('this is a test')
+# 测试buffer memory
+
+
+from QiJiModel.GLM import GLM
+
+MODEL_PATH = "/home/qiji/chatglm2-6b/"  # 模型路径
+llm = GLM()
+llm.load_model(model_name_or_path=MODEL_PATH)
+
+# 请注意,你需要使用这些模块,可以使用更加高级的
+from langchain.memory import ConversationBufferMemory  # 这是最简单的,后面会教学使用高级记忆
+from langchain.chains import ConversationChain
+
+memory = ConversationBufferMemory()
+conversation = ConversationChain(
+    llm=llm,
+    verbose=True,
+    memory=ConversationBufferMemory()
+)
+
+index = 0
+while index < 2:
+    index += 1
+    q = input('> ')
+    print(conversation.predict(input=q))

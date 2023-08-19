@@ -46,7 +46,7 @@ llm.load_model(model_name_or_path=MODEL_PATH)
 # 然后就可以放入`langchain`中使用
 ```
 
-* 使用流式输出
+* 使用流式输出(streaming output)
   在GLM类中存在一个常量布尔值
 
 ```python
@@ -213,4 +213,35 @@ for _ in res_list:
 ```
 
 
+
+
+
+# `langchain`使用指南
+
+## 使用`ConversationBufferMemory`和`ConversationChain`实现上下文记忆
+* 注意,这个上下文的记忆很可能导致内存使用超出限制,我们需要限制保存的记忆大小(后续可能会实现)
+```python
+from QiJiModel.GLM import GLM
+
+MODEL_PATH = "/home/qiji/chatglm2-6b/"  # 模型路径
+llm = GLM()
+llm.load_model(model_name_or_path=MODEL_PATH)
+
+# 请注意,你需要使用这些模块,可以使用更加高级的
+from langchain.memory import ConversationBufferMemory  # 这是最简单的,后面会教学使用高级记忆
+from langchain.chains import ConversationChain
+
+memory = ConversationBufferMemory()
+conversation = ConversationChain(
+    llm=llm,
+    verbose=True,
+    memory=ConversationBufferMemory()
+)
+
+index = 0
+while index < 2:
+    index += 1
+    q = input('> ')
+    print(conversation.predict(input=q))
+```
 

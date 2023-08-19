@@ -17,13 +17,15 @@ FILE_LOADER_TYPE = Union[
 
 # 用来实现便捷的相似度文本匹配
 class SimilaritySearch(object):
-    def __init__(self, embeddings=None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
+    def __init__(self, embeddings=None, persist_path: str = None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
         self.db: Chroma = None  # 数据库
         if embeddings is None:
             embedding_model_path: str = "/home/qiji/text2vec-large-chinese"  # `text2vec-large-chinese`的模型路径
             embeddings: Text2Vec = Text2Vec(model_name=embedding_model_path)  # 加载模型
 
         self.embeddings = embeddings  # 词向量模型
+
+        self.persist_path = persist_path  # 持久化路径
 
     def load_text(self, file_path: str, chunk_size: int = 300, chunk_overlap: int = 100) -> bool:
         """
@@ -36,7 +38,8 @@ class SimilaritySearch(object):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                            chunk_overlap=chunk_overlap)  # 实例化用来分割文本的类
             documents = text_splitter.split_documents(raw_documents)  # 分割文本
-            self.db = Chroma.from_documents(documents, self.embeddings)  # 将文本转换为向量并存储
+            self.db = Chroma.from_documents(documents, self.embeddings,
+                                            persist_directory=self.persist_path)  # 将文本转换为向量并存储
 
         except Exception as e:
             return False
@@ -52,11 +55,21 @@ class SimilaritySearch(object):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                            chunk_overlap=chunk_overlap)  # 实例化用来分割文本的类
             documents = text_splitter.split_documents(raw_documents)  # 分割文本
-            self.db = Chroma.from_documents(documents, self.embeddings)  # 将文本转换为向量并存储
+            self.db = Chroma.from_documents(documents, self.embeddings,
+                                            persist_directory=self.persist_path)  # 将文本转换为向量并存储
 
         except Exception as e:
             return False
 
+        return True
+
+    def load_db(self, db_path: str) -> bool:
+        try:
+            # 从持久化路径加载数据库
+            self.db = Chroma(persist_directory=db_path, embedding_function=self.embeddings)
+
+        except Exception as e:
+            return False
         return True
 
     def load(self, file_path: str) -> bool:
@@ -69,6 +82,13 @@ class SimilaritySearch(object):
             return self.load_text(file_path)
 
         return False
+
+    def save(self):
+        if self.persist_path is not None:
+            self.db.persist()  # 持久化
+        else:
+            # 如果没有指定持久化路径,则抛出异常
+            raise Exception("没有持久化路径")
 
     def search(self, query: str, top_k: int = 3) -> list[str]:
         """
@@ -85,12 +105,11 @@ class SimilaritySearch(object):
 
 
 if __name__ == '__main__':
-    # 实例化搜索类
-    search = SimilaritySearch()
-    # 加载数据
-    file_path = "/home/qiji/Container/xuhe/compare_car/data/car_names.txt"
-    search.load_text(file_path)
-    # 搜索
-    query = "奥迪"
-    result = search.search(query)
-    print(result)
+    ss = SimilaritySearch()
+
+    DB_PATH = '/home/qiji/tmp/chroma'  # 数据库路径!
+
+    ss.load_db(DB_PATH)  # 加载数据库!
+
+    for _ in ss.search('丰田C-HR'):
+        print(_)

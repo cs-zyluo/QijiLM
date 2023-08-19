@@ -42,6 +42,8 @@ if __name__ == '__main__':
     llm = GLM()
     llm.load_model(model_name_or_path=MODEL_PATH, checkpoint_path=CHECKPOINT_PATH)
 
+    llm.STREAMING_OUTPUT = True  # 设置为True，可以加速回答速度
+
     # test:测试是否可以正常运行回答
     prompt = PromptTemplate(
         input_variables=["question"],

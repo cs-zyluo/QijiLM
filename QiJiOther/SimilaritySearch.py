@@ -46,7 +46,8 @@ class SimilaritySearch(object):
     def load_dir(self, dir_path: str, loader_cls: FILE_LOADER_TYPE, chunk_size: int = 300, chunk_overlap: int = 100,
                  show_progress: bool = True) -> bool:
         try:
-            raw_documents = DirectoryLoader(dir_path, loader_cls=loader_cls, show_progress=show_progress).load()
+            raw_documents = DirectoryLoader(dir_path, loader_cls=loader_cls, show_progress=show_progress,
+                                            use_multithreading=True).load()  # 我在这使用了多线程,如果出现问题,删除`use_multithreading=True`
             print(raw_documents)
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                            chunk_overlap=chunk_overlap)  # 实例化用来分割文本的类
@@ -81,3 +82,15 @@ class SimilaritySearch(object):
 
         docs = self.db.similarity_search(query, k=top_k)  # 查询，注意`k`是返回的文本数量
         return [doc.page_content for doc in docs]  # 返回文本
+
+
+if __name__ == '__main__':
+    # 实例化搜索类
+    search = SimilaritySearch()
+    # 加载数据
+    file_path = "/home/qiji/Container/xuhe/compare_car/data/car_names.txt"
+    search.load_text(file_path)
+    # 搜索
+    query = "奥迪"
+    result = search.search(query)
+    print(result)

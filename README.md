@@ -7,6 +7,7 @@
 * `!!!如果需要写特殊的注释,请放在文件的开头!!!`
 * 修改之后提倡加上`自己的名字,什么时候修改了什么部分`,不写也没事
 * !!!注意重构之后的代码大多使用的是继承和多态.所以请不要随意修改父类的方法,如果需要修改,请在子类中重写!!!
+* !!!使用`绝对路径`!!!
 
 # tips
 
@@ -160,6 +161,16 @@ print(docs[1].page_content)
 
 ### `SimilaritySearch`class
 
+* 注意!!!你使用的路径必须是`./`的相对路径或者是`/home/`的绝对路径,不可以使用`~/`的路径
+
+#### `__init__`构造函数
+```python
+def __init__(self, embeddings=None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
+```
+* 参数
+1. `embeddings`是一个模型,如果你不传入,那么就会使用默认的模型(一般不需要传入)
+
+
 #### `load_text`加载文本内容
 
 * 相似度匹配
@@ -168,7 +179,7 @@ print(docs[1].page_content)
 from QiJiOther.SimilaritySearch import SimilaritySearch
 
 ss = SimilaritySearch()  # 实例化
-file_path = "./xuhe/data/car_names.txt"
+file_path = "./xuhe/data/car_names.txt"  # 注意!!!你使用的路径必须是`./`的相对路径或者是`/home/`的绝对路径,不可以使用`~/`的路径
 ss.load_text(file_path=file_path, chunk_size=100, chunk_overlap=50)  # 加载文本
 ```
 
@@ -186,7 +197,7 @@ from QiJiOther.SimilaritySearch import SimilaritySearch
 from langchain.document_loaders import TextLoader
 
 ss = SimilaritySearch()  # 实例化
-dir_path = "./xuhe/data"
+dir_path = "./xuhe/data"  # 注意!!!你使用的路径必须是`./`的相对路径或者是`/home/`的绝对路径,不可以使用`~/`的路径
 ss.load_dir(dir_path=dir_path, loader_cls=TextLoader)  # 加载文本
 
 res_list = ss.search("丰田C-HR")
@@ -212,14 +223,12 @@ for _ in res_list:
     print(_)
 ```
 
-
-
-
-
 # `langchain`使用指南
 
 ## 使用`ConversationBufferMemory`和`ConversationChain`实现上下文记忆
+
 * 注意,这个上下文的记忆很可能导致内存使用超出限制,我们需要限制保存的记忆大小(后续可能会实现)
+
 ```python
 from QiJiModel.GLM import GLM
 

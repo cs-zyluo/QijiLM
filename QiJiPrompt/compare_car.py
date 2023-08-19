@@ -34,6 +34,8 @@ if __name__ == '__main__':
     llm = GLM()
     llm.load_model(model_name_or_path=MODEL_PATH)
 
+    llm.STREAMING_OUTPUT = True  # 设置为True,使用流式输出,可以提高生成速度,但是会牺牲一定的生成质量
+
     from langchain.chains import LLMChain
     from langchain.chains import SequentialChain
 
@@ -47,4 +49,8 @@ if __name__ == '__main__':
         verbose=True
     )
 
-    print(chain.run(question="雷克萨斯RX和起亚K9哪个好"))
+    # print(chain.run(question="雷克萨斯RX和起亚K9哪个好"))
+    index = 0
+    while index<2:
+        q = input()
+        chain.run(question=q)

@@ -1,4 +1,5 @@
 import os
+import sys
 
 from langchain.llms.base import LLM
 from transformers import AutoTokenizer, AutoModel, AutoConfig
@@ -60,14 +61,18 @@ class GLM(LLM):
 
         # 以下是修改之后的更易懂的代码
         response = ""  # 这个变量是用来存储返回的结果的
+        pre_response = ""  # 这个变量是用来存储上一次的返回结果的
         for response, _ in self.model.stream_chat(
                 self.tokenizer, prompt,
                 history=history[-self.history_len:] if self.history_len > 0 else [],
                 max_length=self.max_token, temperature=self.temperature,
                 top_p=self.top_p):
             if self.STREAMING_OUTPUT:  # 如果使用流式输出
-                os.system('clear')  # 清屏
-                print(response, flush=True)  # 输出
+                sys.stdout.write(str(response)[len(pre_response):])  # 输出 response 字符串,去掉上一次的 response
+                sys.stdout.flush()  # 立即刷新到标准输出
+                pre_response = str(response)  # 更新 pre_response
+        if self.STREAMING_OUTPUT:  # 如果使用流式输出
+            print()  # 输出一个换行符,因为上面的代码没有输出换行符
 
         return response
 
@@ -93,4 +98,5 @@ if __name__ == '__main__':
     while index < 2:
         index += 1
         product = input('> ')
-        print(chain.run(product))
+        # print(chain.run(product))
+        chain.run(product)

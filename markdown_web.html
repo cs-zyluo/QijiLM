@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Marked in the browser</title>
+    <!-- 引入 Showdown 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
+    <link rel="stylesheet" href="css/markdown_file.css"/>
+</head>
+<body background="web_background.jpg">
+<div id="markdown-content"></div>
+
+<script>
+    function showMarkdown(text) {
+        // 创建 Showdown 实例
+        let converter = new showdown.Converter();
+
+        // 进行转换
+        let html = converter.makeHtml(text);
+
+        // 将转换后的 HTML 内容显示到指定的地方
+        document.getElementById("markdown-content").innerHTML = html;
+    }
+</script>
+
+<script src="js/readFileContent.js"></script>
+
+<script>
+    readFileContent("README.md",showMarkdown)
+</script>
+
+</body>
+</html>

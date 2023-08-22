@@ -165,10 +165,11 @@ print(docs[1].page_content)
 
 #### `__init__`构造函数
 ```python
-def __init__(self, embeddings=None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
+def __init__(self, embeddings=None, persist_path: str = None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
 ```
 * 参数
 1. `embeddings`是一个模型,如果你不传入,那么就会使用默认的模型(一般不需要传入)
+2. `persist_path`是本地数据库的保存路径,如果你不传入,那么就不能保存到本地(一般不需要传入,只有在训练的时候才需要传入)
 
 
 #### `load_text`加载文本内容
@@ -206,6 +207,40 @@ for _ in res_list:
     print()
     print(_)
 ```
+
+#### `load_db`从本地的向量书库路径加载数据库
+```python
+from QiJiOther.SimilaritySearch import SimilaritySearch
+
+ss = SimilaritySearch()
+
+DB_PATH = '/home/qiji/tmp/chroma'  # 数据库路径!
+
+ss.load_db(DB_PATH)  # 加载数据库!
+
+for _ in ss.search('丰田C-HR'):
+    print(_)
+```
+
+
+#### `save`保存向量数据库到本地
+* 注意!你需要在`__init__`构造函数中传入`persist_path(数据库保存路径)`参数,否则会报错
+* 需要手动`save()`保存数据库到本地
+```python
+from QiJiOther.SimilaritySearch import SimilaritySearch
+
+PERSIST_PATH = "/home/qiji/tmp/chroma"  # 持久化路径
+ss = SimilaritySearch(persist_path=PERSIST_PATH)  # 在构造函数中传入持久化路径
+
+FILE_PATH = "/home/qiji/Container/xuhe/compare_car/data/car_names.txt"
+
+ss.load_text(FILE_PATH)
+ss.save()  # 把数据库保存到磁盘!
+
+for _ in ss.search('丰田C-HR'):
+    print(_)
+```
+
 
 #### `search`查找相似文本
 

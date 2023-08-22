@@ -113,11 +113,10 @@
 #     q = input('> ')
 #     print(conversation.predict(input=q))
 
-
 # 测试是否能正确保存我的向量数据库
 from typing import Union, Type
 
-from langchain.vectorstores.chroma import Chroma
+from langchain.vectorstores.faiss import FAISS
 from QiJiModel import Text2Vec
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -135,7 +134,7 @@ FILE_LOADER_TYPE = Union[
 # 用来实现便捷的相似度文本匹配
 class SimilaritySearch(object):
     def __init__(self, embeddings=None, persist_path: str = None):  # 注意:默认的模型的类型是`text2vec-large-chinese`
-        self.db: Chroma = None  # 数据库
+        self.db: FAISS = None  # 数据库
         if embeddings is None:
             embedding_model_path: str = "/home/qiji/text2vec-large-chinese"  # `text2vec-large-chinese`的模型路径
             embeddings: Text2Vec = Text2Vec(model_name=embedding_model_path)  # 加载模型
@@ -155,7 +154,7 @@ class SimilaritySearch(object):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                            chunk_overlap=chunk_overlap)  # 实例化用来分割文本的类
             documents = text_splitter.split_documents(raw_documents)  # 分割文本
-            self.db = Chroma.from_documents(documents, self.embeddings,
+            self.db = FAISS.from_documents(documents, self.embeddings,
                                             persist_directory=self.persist_path)  # 将文本转换为向量并存储
 
         except Exception as e:
@@ -172,7 +171,7 @@ class SimilaritySearch(object):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                            chunk_overlap=chunk_overlap)  # 实例化用来分割文本的类
             documents = text_splitter.split_documents(raw_documents)  # 分割文本
-            self.db = Chroma.from_documents(documents, self.embeddings,
+            self.db = FAISS.from_documents(documents, self.embeddings,
                                             persist_directory=self.persist_path)  # 将文本转换为向量并存储
 
         except Exception as e:
@@ -183,7 +182,7 @@ class SimilaritySearch(object):
     def load_db(self, db_path: str) -> bool:
         try:
             # 从持久化路径加载数据库
-            self.db = Chroma(persist_directory=db_path, embedding_function=self.embeddings)
+            self.db = FAISS(persist_directory=db_path, embedding_function=self.embeddings)
 
         except Exception as e:
             return False
@@ -221,11 +220,12 @@ class SimilaritySearch(object):
         return [doc.page_content for doc in docs]  # 返回文本
 
 
-PERSIST_PATH = "/home/qiji/tmp/chroma"
-ss = SimilaritySearch(persist_path=PERSIST_PATH)  # 实例化
-FILE_PATH = "/home/qiji/Container/xuhe/compare_car/data/car_names.txt"
+if __name__ == '__main__':
+    PERSIST_PATH = "/home/qiji/tmp/chroma"
+    ss = SimilaritySearch(persist_path=PERSIST_PATH)  # 实例化
+    FILE_PATH = "/home/qiji/Container/xuhe/compare_car/data/car_names.txt"
 
-ss.load_db(PERSIST_PATH)
+    ss.load_db(PERSIST_PATH)
 
-for _ in ss.search('丰田C-HR'):
-    print(_)
+    for _ in ss.search('丰田C-HR'):
+        print(_)

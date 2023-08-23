@@ -12,7 +12,7 @@ class GLM(BASE_GLM):
     def __init__(self):
         super().__init__()
 
-    @overrides
+    # @overrides
     def load_model(self, llm_device="gpu", model_name_or_path: str = None, checkpoint_path: str = None):
         config = AutoConfig.from_pretrained(model_name_or_path, trust_remote_code=True, pre_seq_len=128)  # 加载配置文件
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)  # 加载分词器

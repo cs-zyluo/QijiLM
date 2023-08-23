@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* 设置整个列表的边框和背景 */
+ul {
+    border: 2px solid #3498db;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 设置列表项的边框和间距 */
+li {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #fff;
+    border-radius: 3px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* 鼠标悬停时改变列表项的背景色 */
+li:hover {
+    background-color: lightgrey;
+}

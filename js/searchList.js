@@ -17,15 +17,15 @@ searchInput.addEventListener("input", function () {
         const index = text.indexOf(searchTerm);
 
         if (index !== -1) {
-            // 创建一个新字符串，标注关键词
-            const markedText = item.textContent.slice(0, index)
-                + "<span class='highlight'>"
-                + item.textContent.slice(index, index + searchTerm.length)
-                + "</span>"
-                + item.textContent.slice(index + searchTerm.length);
-
-            // 将标注后的文本赋值给列表项
-            item.innerHTML = markedText;
+            // // 创建一个新字符串，标注关键词
+            // const markedText = item.textContent.slice(0, index)
+            //     + "<span class='highlight'>"
+            //     + item.textContent.slice(index, index + searchTerm.length)
+            //     + "</span>"
+            //     + item.textContent.slice(index + searchTerm.length);
+            //
+            // // 将标注后的文本赋值给列表项
+            // item.innerHTML = markedText;
 
             // 显示匹配的列表项
             item.style.display = "block";
@@ -64,3 +64,8 @@ document.addEventListener("keydown", function (event) {
         searchInput.classList.remove("expanded");
     }
 })
+
+//监听输入框有焦点事件
+searchInput.addEventListener("focus", function () {
+    searchInput.classList.add("expanded") /*取消扩大状态*/
+});

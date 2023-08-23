@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+
     <title>搜索框示例</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/list-style.css">
+    <link rel="stylesheet" href="css/class-info-style.css">
+
 </head>
-<body>
+<body style='background-image: url("./web_background.jpg")'>
 <!-- 输入框 -->
 <label>
     <input type="text" id="searchInput" placeholder="按下/进入搜索框">
@@ -13,15 +17,30 @@
 
 <!-- 一个包含水果名称的无序列表 -->
 <ul id="list">
-    <li>apple</li>
-    <li>banana</li>
-    <li>orange</li>
-    <li>application</li>
-    <li>etc</li>
+    <li>
+        <h1 class="class-title">
+            apple
+        </h1>
+        <p class="class-description">
+            这是一个apple类，这个苹果很好吃!
+        </p>
+        <label>
+            访问我的<a class="class-doc-link" href="https://www.github.com">类的API文档</a>了解更多信息。
+        </label>
+        <p class="class-tips">
+
+        </p>
+    </li>
+    <li>
+        <a href="https://www.github.com">banana</a>
+    </li>
+    <li>
+        <a href="https://www.github.com">application</a>
+    </li>
 </ul>
 
 <!-- JavaScript 部分 -->
-<script src="js/search_list.js"></script>
+<script src="js/searchList.js"></script>
 
 </body>
 </html>

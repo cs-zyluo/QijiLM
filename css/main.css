@@ -20,4 +20,6 @@
 /*搜索框变大*/
 #searchInput.expanded {
     width: 800px; /*变大之后的*/
+
+    border: 8px solid lightblue;
 }
